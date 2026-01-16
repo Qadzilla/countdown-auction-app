@@ -25,51 +25,12 @@
     <section id="auctions" class="auctions-section">
       <h3>Live Auctions</h3>
 
-      <div class="auction-list">
-        <article class="auction-item" data-ends-at="2026-01-16T12:00:00Z">
-          <div class="auction-info">
-            <h4>Vintage Watch Collection</h4>
-            <p class="auction-description">Rare 1960s timepiece in excellent condition</p>
-            <div class="auction-meta">
-              <span class="current-bid">Current Bid: $450</span>
-              <span class="bid-count">12 bids</span>
-            </div>
-          </div>
-          <div class="auction-timer">
-            <span class="timer-label">Time Remaining</span>
-            <span class="countdown" data-countdown>--:--:--</span>
-          </div>
-        </article>
+      <div id="auction-list" class="auction-list">
+        <p class="loading-message">Loading auctions...</p>
+      </div>
 
-        <article class="auction-item" data-ends-at="2026-01-15T23:30:00Z">
-          <div class="auction-info">
-            <h4>Abstract Art Print</h4>
-            <p class="auction-description">Limited edition signed print, 24x36 inches</p>
-            <div class="auction-meta">
-              <span class="current-bid">Current Bid: $120</span>
-              <span class="bid-count">5 bids</span>
-            </div>
-          </div>
-          <div class="auction-timer">
-            <span class="timer-label">Time Remaining</span>
-            <span class="countdown" data-countdown>--:--:--</span>
-          </div>
-        </article>
-
-        <article class="auction-item auction-item--ended" data-ends-at="2025-01-14T10:00:00Z">
-          <div class="auction-info">
-            <h4>Antique Desk Lamp</h4>
-            <p class="auction-description">Art deco brass lamp, fully restored</p>
-            <div class="auction-meta">
-              <span class="current-bid">Final Price: $85</span>
-              <span class="bid-count">8 bids</span>
-            </div>
-          </div>
-          <div class="auction-timer">
-            <span class="timer-label">Status</span>
-            <span class="countdown countdown--ended">ENDED</span>
-          </div>
-        </article>
+      <div id="empty-state" class="empty-state" hidden>
+        <p>No auctions available yet.</p>
       </div>
     </section>
   </main>

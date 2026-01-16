@@ -194,6 +194,26 @@ body {
   font-size: 0.9rem;
 }
 
+/* Loading, Empty, and Error States */
+.loading-message,
+.empty-state p,
+.error-message {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.empty-state {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+  color: #e74c3c;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .hero h2 {

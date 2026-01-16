@@ -1,7 +1,18 @@
 /**
  * Countdown Auction - Client-side TypeScript
- * Handles live countdown timer updates for auction items
+ * Fetches auction items from API and handles live countdown timers
  */
+
+// Item type matching the API response
+interface Item {
+  id: string;
+  title: string;
+  description: string;
+  startingPrice: number;
+  endsAt: string;
+  status: 'active' | 'closed';
+  createdAt: string;
+}
 
 /**
  * Format milliseconds as HH:MM:SS
@@ -17,6 +28,76 @@ function formatCountdown(ms: number): string {
   return [hours, minutes, seconds]
     .map(n => n.toString().padStart(2, '0'))
     .join(':');
+}
+
+/**
+ * Format price as currency
+ */
+function formatPrice(amount: number): string {
+  return `$${amount.toFixed(2)}`;
+}
+
+/**
+ * Fetch items from the API
+ */
+async function fetchItems(): Promise<Item[]> {
+  const response = await fetch('/api/items');
+  if (!response.ok) {
+    throw new Error('Failed to fetch items');
+  }
+  return response.json();
+}
+
+/**
+ * Render a single auction item
+ */
+function renderItem(item: Item): string {
+  const endsAt = new Date(item.endsAt).getTime();
+  const now = Date.now();
+  const isEnded = endsAt <= now || item.status === 'closed';
+
+  return `
+    <article class="auction-item${isEnded ? ' auction-item--ended' : ''}" data-item-id="${item.id}" data-ends-at="${item.endsAt}">
+      <div class="auction-info">
+        <h4>${escapeHtml(item.title)}</h4>
+        <p class="auction-description">${escapeHtml(item.description)}</p>
+        <div class="auction-meta">
+          <span class="current-bid">${isEnded ? 'Starting Price' : 'Starting Price'}: ${formatPrice(item.startingPrice)}</span>
+        </div>
+      </div>
+      <div class="auction-timer">
+        <span class="timer-label">${isEnded ? 'Status' : 'Time Remaining'}</span>
+        <span class="countdown${isEnded ? ' countdown--ended' : ''}" data-countdown>${isEnded ? 'ENDED' : '--:--:--'}</span>
+      </div>
+    </article>
+  `;
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text: string): string {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/**
+ * Render all items to the page
+ */
+function renderItems(items: Item[]): void {
+  const listEl = document.getElementById('auction-list');
+  const emptyEl = document.getElementById('empty-state');
+
+  if (!listEl || !emptyEl) return;
+
+  if (items.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.hidden = false;
+  } else {
+    emptyEl.hidden = true;
+    listEl.innerHTML = items.map(renderItem).join('');
+  }
 }
 
 /**
@@ -62,14 +143,24 @@ function updateCountdowns(): void {
 }
 
 /**
- * Initialize countdown timers
+ * Initialize the application
  */
-function init(): void {
-  // Update immediately
-  updateCountdowns();
+async function init(): Promise<void> {
+  try {
+    // Fetch and render items
+    const items = await fetchItems();
+    renderItems(items);
 
-  // Update every second
-  setInterval(updateCountdowns, 1000);
+    // Start countdown updates
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+  } catch (error) {
+    console.error('Failed to load auctions:', error);
+    const listEl = document.getElementById('auction-list');
+    if (listEl) {
+      listEl.innerHTML = '<p class="error-message">Failed to load auctions. Please try again later.</p>';
+    }
+  }
 }
 
 // Start when DOM is ready
