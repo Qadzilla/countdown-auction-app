@@ -30,7 +30,8 @@ describe('API Integration Tests', () => {
       const response = await request(app).get('/');
 
       expect(response.text).toContain('Countdown Auction');
-      expect(response.text).toContain('Setup OK');
+      expect(response.text).toContain('Bid Before Time Runs Out');
+      expect(response.text).toContain('Live Auctions');
     });
   });
 
