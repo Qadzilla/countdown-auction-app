@@ -1,24 +1,21 @@
 # Countdown Auction App
 
-A time-based auction application where items have end times, show time remaining, and auto-close when the timer hits zero.
+A real-time auction application where items have countdown timers, auto-close when expired, and support live bidding.
 
-## Status
+## Features
 
-**Vertical Slice #1: Setup** - Complete
-
-## Features (Planned)
-
-- Create auction items with `endsAt` deadline
-- Live countdown display (HH:MM:SS)
-- Server-enforced deadlines (items lock when expired)
-- Auto-close via background sweeper + request-time enforcement
-- Bidding rules and locked state after expiration
+- Create auction items with title, description, starting price, and end time
+- Live countdown display (HH:MM:SS) that updates every second
+- Place bids on active auctions (must exceed current bid)
+- Server-enforced deadlines - items automatically lock when expired
+- Dual expiration enforcement: background sweeper + request-time checks
+- Responsive UI with modal forms and instant feedback
 
 ## Tech Stack
 
 - **Backend:** Node.js + Express + TypeScript (ESM)
-- **Client:** Plain HTML + CSS
-- **Testing:** Vitest + Supertest
+- **Frontend:** HTML + CSS + TypeScript (compiled to JS)
+- **Testing:** Vitest + Supertest (43 tests)
 
 ## Getting Started
 
@@ -46,8 +43,8 @@ npm start
 ### Testing
 
 ```bash
-npm test          # Run tests once
-npm run test:watch  # Watch mode
+npm test           # Run tests once
+npm run test:watch # Watch mode
 ```
 
 ## API Endpoints
@@ -56,27 +53,61 @@ npm run test:watch  # Watch mode
 |--------|------|-------------|
 | GET | `/` | Serves the client HTML |
 | GET | `/health` | Health check (`{ ok: true }`) |
+| GET | `/api/items` | Get all auction items |
+| GET | `/api/items/:id` | Get a single item by ID |
+| POST | `/api/items` | Create a new auction item |
+| POST | `/api/items/:id/bid` | Place a bid on an item |
+
+### Create Item Request
+
+```json
+{
+  "title": "Vintage Watch",
+  "description": "A beautiful timepiece",
+  "startingPrice": 100,
+  "endsAt": "2026-01-20T12:00:00Z"
+}
+```
+
+### Place Bid Request
+
+```json
+{
+  "amount": 150,
+  "bidderId": "user123"
+}
+```
 
 ## Project Structure
 
 ```
-├── public/              # Static client files
+├── public/                  # Static client files
 │   ├── index.html
-│   └── styles.css
+│   ├── styles.css
+│   └── main.js              # Compiled from src/client/main.ts
 ├── src/
-│   ├── domain/          # Business logic
-│   │   ├── time.ts      # Clock/timer utilities
-│   │   └── types.ts     # Item, Bid types
-│   └── server/          # Express server
+│   ├── client/              # Frontend TypeScript
+│   │   └── main.ts          # Client-side logic (countdown, bidding, forms)
+│   ├── domain/              # Business logic
+│   │   ├── store.ts         # In-memory data store
+│   │   ├── sweeper.ts       # Background job for auto-closing auctions
+│   │   ├── time.ts          # Clock utilities (real + fake for testing)
+│   │   └── types.ts         # TypeScript interfaces
+│   └── server/              # Express server
 │       ├── routes/
-│       │   └── health.ts
-│       ├── app.ts       # Express app instance
-│       └── index.ts     # Server entry point
+│       │   ├── health.ts    # Health check endpoint
+│       │   └── items.ts     # Items API endpoints
+│       ├── app.ts           # Express app configuration
+│       └── index.ts         # Server entry point
 ├── tests/
-│   ├── api/             # Integration tests
-│   └── unit/            # Unit tests
-├── package.json
-├── tsconfig.json
+│   ├── api/                 # Integration tests
+│   │   ├── health.test.ts
+│   │   └── items.test.ts
+│   └── unit/                # Unit tests
+│       ├── sweeper.test.ts
+│       └── time.test.ts
+├── tsconfig.json            # Server TypeScript config
+├── tsconfig.client.json     # Client TypeScript config
 └── vitest.config.ts
 ```
 
@@ -85,16 +116,16 @@ npm run test:watch  # Watch mode
 | Script | Description |
 |--------|-------------|
 | `npm run dev` | Start dev server with tsx watch |
-| `npm run build` | Compile TypeScript to `dist/` |
+| `npm run build` | Compile TypeScript (server + client) |
 | `npm start` | Run compiled production server |
 | `npm test` | Run all tests |
 | `npm run test:watch` | Run tests in watch mode |
 
-## Testing Strategy
+## Architecture Highlights
 
 - **Clock injection:** `time.ts` exports a `Clock` interface for dependency injection, enabling deterministic time-based tests with fake clocks
-- **Unit tests:** Test time utilities with controlled clock
-- **API tests:** Use Supertest for HTTP endpoint testing
+- **Dual expiration:** Items are closed both by a background sweeper (runs every 60s) and on-demand when fetched via API
+- **In-memory store:** Simple Map-based storage - suitable for demos, easily replaceable with a database
 
 ## License
 

@@ -11,6 +11,8 @@ export interface Item {
   title: string;
   description: string;
   startingPrice: number;
+  currentBid: number | null;
+  bidCount: number;
   endsAt: Date;
   status: ItemStatus;
   createdAt: Date;
@@ -24,7 +26,13 @@ export interface CreateItemInput {
   endsAt: string; // ISO string from client
 }
 
-// Bid (placeholder for future slice)
+// Input for placing a bid
+export interface PlaceBidInput {
+  amount: number;
+  bidderId: string;
+}
+
+// Bid record
 export interface Bid {
   id: string;
   itemId: string;

@@ -25,6 +25,8 @@ export function createItem(input: CreateItemInput): Item {
     title: input.title,
     description: input.description,
     startingPrice: input.startingPrice,
+    currentBid: null,
+    bidCount: 0,
     endsAt: new Date(input.endsAt),
     status: 'active',
     createdAt: now,
@@ -46,6 +48,33 @@ export function getAllItems(): Item[] {
  */
 export function getItemById(id: string): Item | undefined {
   return items.get(id);
+}
+
+/**
+ * Update item status
+ */
+export function updateItemStatus(id: string, status: Item['status']): Item | undefined {
+  const item = items.get(id);
+  if (!item) return undefined;
+
+  item.status = status;
+  return item;
+}
+
+/**
+ * Place a bid on an item
+ * Returns the updated item, or null if bid is invalid
+ */
+export function placeBid(itemId: string, amount: number): Item | null {
+  const item = items.get(itemId);
+  if (!item) return null;
+
+  const minBid = item.currentBid ?? item.startingPrice;
+  if (amount <= minBid) return null;
+
+  item.currentBid = amount;
+  item.bidCount += 1;
+  return item;
 }
 
 /**

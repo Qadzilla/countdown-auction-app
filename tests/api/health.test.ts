@@ -34,10 +34,4 @@ describe('API Integration Tests', () => {
       expect(response.text).toContain('Live Auctions');
     });
   });
-
-  // TODO: Add more API tests in future slices:
-  // - POST /api/items - create auction item
-  // - GET /api/items/:id - get item with time remaining
-  // - POST /api/items/:id/bid - place bid
-  // - Test expired item rejection
 });

@@ -86,9 +86,4 @@ describe('time utilities', () => {
       expect(formatCountdown(ms)).toBe('100:00:00');
     });
   });
-
-  // TODO: Add more tests in future slices:
-  // - Test deadline enforcement
-  // - Test auto-close timing logic
-  // - Test edge cases around expiration
 });
